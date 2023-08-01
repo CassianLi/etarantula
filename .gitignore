@@ -15,6 +15,7 @@ gen
 .goreleaser.yml
 frpc.ini
 .goreleaser.yaml
+go.sum
 
 dist
 
