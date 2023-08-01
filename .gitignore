@@ -10,6 +10,7 @@ gen
 *test.conf
 *test.json
 *test.go
+*pro.yaml
 
 # goreleaser config
 .goreleaser.yml
@@ -20,3 +21,4 @@ go.sum
 dist
 
 *.png
+

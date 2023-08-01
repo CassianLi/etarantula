@@ -17,6 +17,13 @@ import (
 	"time"
 )
 
+const (
+	Success         = "SUCCESS"
+	PageError       = "PAGE_ERROR"
+	PriceError      = "PRICE_ERROR"
+	ScreenshotError = "SCREENSHOT_ERROR"
+)
+
 type AmazonCategory struct {
 	// Category 请求参数
 	Category models.CategoryInfoRequest
@@ -40,6 +47,7 @@ func (amazon *AmazonCategory) GetCategoryInfo() (info models.CategoryInfo, err e
 	// 创建一个chrome实例
 	ctx, cancel, err := amazon.createContext()
 	if err != nil {
+		info.Status = PageError
 		info.Errors = append(info.Errors, err.Error())
 		return info, err
 	}
@@ -51,12 +59,14 @@ func (amazon *AmazonCategory) GetCategoryInfo() (info models.CategoryInfo, err e
 	// 获取web link
 	url, err := amazon.getWebLink()
 	if err != nil {
+		info.Status = PageError
 		info.Errors = append(info.Errors, err.Error())
 		return info, err
 	}
 
 	err = utils.Navigate(ctx, url)
 	if err != nil {
+		info.Status = PageError
 		info.Errors = append(info.Errors, "打开Amazon页面失败")
 		return info, err
 	}
@@ -64,23 +74,30 @@ func (amazon *AmazonCategory) GetCategoryInfo() (info models.CategoryInfo, err e
 	// 下载html
 	html, err := amazon.downloadHtml(ctx)
 	if err != nil {
+		info.Status = PriceError
 		info.Errors = append(info.Errors, "下载html失败")
+		return info, err
+	}
+
+	// 解析html
+	err = amazon.parseProductInfo(html, &info)
+	if err != nil {
+		info.Status = PriceError
+		info.Errors = append(info.Errors, err.Error())
 		return info, err
 	}
 
 	// 保存截图
 	filename, err := amazon.saveScreenshot(ctx)
 	if err != nil {
+		info.Status = ScreenshotError
 		info.Errors = append(info.Errors, "保存截图失败")
 		return info, err
 	}
 	info.Screenshot = filename
 
-	// 解析html
-	err = amazon.parseProductInfo(html, &info)
-	if err != nil {
-		info.Errors = append(info.Errors, err.Error())
-		return info, err
+	if len(info.Errors) == 0 {
+		info.Status = "SUCCESS"
 	}
 
 	return info, err
