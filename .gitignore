@@ -1,0 +1,21 @@
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+
+# Test config files
+*test.properties
+*test.yaml
+*test.conf
+*test.json
+*test.go
+
+# goreleaser config
+.goreleaser.yml
+frpc.ini
+.goreleaser.yaml
+
+dist
+
+*.png

@@ -1,0 +1,52 @@
+debug: true
+
+# 是否启用全局context，如果启用，将会在每个请求中注入一个全局context，并在每次打开网页后不关闭浏览器页面。默认为false
+global-context: true
+
+# ossutil credentials and bucket
+oss:
+  endpoint: " "
+  access-key-id: " "
+  access-key-secret: " "
+  bucket: " "
+  # path
+  path: " "
+
+amazon:
+  # Amazon product details link
+  urls:
+    # https: " "
+    de: " "
+    es: " "
+    it: " "
+    fr: " "
+  price-selectors: " "
+  description-selectors: " "
+
+mq:
+  url: " "
+  queue: " "
+  exchange: " "
+  exchange-type: " "
+
+# info 结果回调队列
+pub-mq:
+  url: " "
+  queue: " "
+  exchange: " "
+  exchange-type: " "
+
+email:
+  host: " "
+  password: " "
+  port: " "
+  user: " "
+
+waring-email:
+  to:
+    - ljr@asllgg.com
+  cc:
+  #    - york@asldutch.com,YorkZhou
+  subject: " "
+  body: " "
+
