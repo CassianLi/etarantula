@@ -169,7 +169,7 @@ func (amazon *AmazonCategory) saveScreenshot(ctx context.Context) (filename stri
 	// 保存到OSS
 	filename = "AMAZON_O_" + country + "_" + productNo + "_" + time.Now().Format("060102150105") + ".png"
 
-	if viper.GetBool("debug") {
+	if viper.GetBool("save-screenshot-on-disk") {
 		err := os.WriteFile(filename, bytes, 0644)
 		if err != nil {
 			fmt.Println("开启调试模式，保存截图到磁盘失败，文件名：", filename, err)
