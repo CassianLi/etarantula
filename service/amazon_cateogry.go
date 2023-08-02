@@ -44,6 +44,7 @@ func (amazon *AmazonCategory) GetCategoryInfo() (info models.CategoryInfo, err e
 	// 赋值CategoryInfo
 	info = amazon.initCategoryInfo(amazon.Category)
 
+	start := time.Now()
 	// 创建一个chrome实例
 	ctx, cancel, err := amazon.createContext()
 	if err != nil {
@@ -63,14 +64,20 @@ func (amazon *AmazonCategory) GetCategoryInfo() (info models.CategoryInfo, err e
 		info.Errors = append(info.Errors, err.Error())
 		return info, err
 	}
+	end := time.Now()
+	log.Println("1. 创建Context,准备weblink耗时(ms)：", end.Sub(start))
 
+	start = time.Now()
 	err = utils.Navigate(ctx, url)
 	if err != nil {
 		info.Status = PageError
 		info.Errors = append(info.Errors, "打开Amazon页面失败")
 		return info, err
 	}
+	end = time.Now()
+	log.Println("2. 打开weblink耗时(ms)：", end.Sub(start))
 
+	start = time.Now()
 	// 下载html
 	html, err := amazon.downloadHtml(ctx)
 	if err != nil {
@@ -86,7 +93,10 @@ func (amazon *AmazonCategory) GetCategoryInfo() (info models.CategoryInfo, err e
 		info.Errors = append(info.Errors, err.Error())
 		return info, err
 	}
+	end = time.Now()
+	log.Println("3. 下载html并解析Price耗时(ms)：", end.Sub(start))
 
+	start = time.Now()
 	// 保存截图
 	filename, err := amazon.saveScreenshot(ctx)
 	if err != nil {
@@ -95,6 +105,8 @@ func (amazon *AmazonCategory) GetCategoryInfo() (info models.CategoryInfo, err e
 		return info, err
 	}
 	info.Screenshot = filename
+	end = time.Now()
+	log.Println("4. 截图并保存总耗时(s)：", end.Sub(start).Seconds())
 
 	if len(info.Errors) == 0 {
 		info.Status = "SUCCESS"
@@ -128,7 +140,6 @@ func (amazon *AmazonCategory) getWebLink() (string, error) {
 	country := amazon.Category.Country
 	productNo := amazon.Category.ProductNo
 
-	fmt.Println("country:", country)
 	url := viper.GetString("amazon.urls." + strings.ToLower(country))
 
 	if url == "" {
@@ -156,12 +167,15 @@ func (amazon *AmazonCategory) saveScreenshot(ctx context.Context) (filename stri
 		log.Println("获取description元素高度失败，将截图全屏", err)
 	}
 
+	start := time.Now()
 	// 截图
 	bytes, err := utils.GetScreenshot(ctx, height)
 	if err != nil {
 		amazon.Errors = append(amazon.Errors, "截图失败")
 		return
 	}
+	end := time.Now()
+	log.Println("---- 4.1 截图耗时(s)：", end.Sub(start).Seconds())
 
 	country := amazon.Category.Country
 	productNo := amazon.Category.ProductNo
@@ -176,8 +190,8 @@ func (amazon *AmazonCategory) saveScreenshot(ctx context.Context) (filename stri
 		}
 	}
 
-	fmt.Println("开始上传截图到OSS...")
-
+	log.Println("开始上传截图到OSS...")
+	start = time.Now()
 	ali, err := ossutil.NewAliOss(viper.GetString("oss.endpoint"), viper.GetString("oss.access-key-id"), viper.GetString("oss.access-key-secret"))
 	if err != nil {
 		log.Println("创建OSS客户端失败", err)
@@ -191,6 +205,8 @@ func (amazon *AmazonCategory) saveScreenshot(ctx context.Context) (filename stri
 		amazon.Errors = append(amazon.Errors, "上传截图到OSS失败")
 		return
 	}
+	end = time.Now()
+	log.Println("---- 4.2 上传截图到OSS耗时(s)：", end.Sub(start).Seconds())
 
 	return filename, err
 }

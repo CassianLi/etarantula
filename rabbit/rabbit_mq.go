@@ -3,6 +3,7 @@ package rabbitmq
 import (
 	"fmt"
 	"github.com/streadway/amqp"
+	"time"
 )
 
 type RabbitMQ struct {
@@ -23,7 +24,9 @@ func NewRabbitMQ(amqpURI, exchange, exchangeType string) (*RabbitMQ, error) {
 
 	var err error
 
-	mq.conn, err = amqp.Dial(amqpURI)
+	mq.conn, err = amqp.DialConfig(amqpURI, amqp.Config{
+		Heartbeat: time.Second * 30, // Set the heartbeat interval to 30 seconds
+	})
 	if err != nil {
 		return nil, err
 	}

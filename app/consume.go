@@ -9,11 +9,14 @@ import (
 	"tarantula-v2/models"
 	rabbitmq "tarantula-v2/rabbit"
 	"tarantula-v2/service"
+	"time"
 )
 
 // 消息处理函数
 func handler(msg string) {
-	fmt.Println("收到MQ消息：", msg)
+	log.Println("收到MQ消息：", msg)
+
+	start := time.Now()
 	var category models.CategoryInfoRequest
 	// 将 JSON 字符串转换为 Go 类型的实例
 	err := json.Unmarshal([]byte(msg), &category)
@@ -32,23 +35,28 @@ func handler(msg string) {
 	}
 
 	info, err := s.GetCategoryInfo()
-
 	// 调试时，打印回传信息
 	if viper.GetBool("debug") {
 		// categoryInfo 转json string
 		categoryInfoJson, err := json.Marshal(info)
 		if err != nil {
-			log.Println("publish calculate result to MQ, categoryInfo: ", info)
+			log.Println("即将回传截图消息MQ, categoryInfo: ", info)
 		} else {
-			log.Println("publish calculate result to MQ, categoryInfo(json): ", string(categoryInfoJson))
+			log.Println("即将回传截图消息MQ, categoryInfo(json): ", string(categoryInfoJson))
 		}
-
 	}
+	end := time.Now()
+	log.Println("获取品类截图信息总耗时(2)：", end.Sub(start).Seconds())
+
+	start = time.Now()
 	// publish category info to MQ
 	err = publishInfo(info)
 	if err != nil {
-		log.Println("publish calculate result to MQ failed, err: ", err)
+		log.Println("回传截图信息，失败, err: ", err)
+		return
 	}
+	end = time.Now()
+	log.Println("回传截图信息总耗时(ms):", end.Sub(start))
 
 }
 
