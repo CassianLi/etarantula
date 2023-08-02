@@ -46,7 +46,7 @@ func handler(msg string) {
 		}
 	}
 	end := time.Now()
-	log.Println("获取品类截图信息总耗时(2)：", end.Sub(start).Seconds())
+	log.Println("获取品类截图信息总耗时：", end.Sub(start))
 
 	start = time.Now()
 	// publish category info to MQ
@@ -56,7 +56,7 @@ func handler(msg string) {
 		return
 	}
 	end = time.Now()
-	log.Println("回传截图信息总耗时(ms):", end.Sub(start))
+	log.Println("回传截图信息总耗时:", end.Sub(start))
 
 }
 

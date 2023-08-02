@@ -65,7 +65,7 @@ func (amazon *AmazonCategory) GetCategoryInfo() (info models.CategoryInfo, err e
 		return info, err
 	}
 	end := time.Now()
-	log.Println("1. 创建Context,准备weblink耗时(ms)：", end.Sub(start))
+	log.Println("1. 创建Context,准备weblink耗时：", end.Sub(start))
 
 	start = time.Now()
 	err = utils.Navigate(ctx, url)
@@ -75,7 +75,7 @@ func (amazon *AmazonCategory) GetCategoryInfo() (info models.CategoryInfo, err e
 		return info, err
 	}
 	end = time.Now()
-	log.Println("2. 打开weblink耗时(ms)：", end.Sub(start))
+	log.Println("2. 打开weblink耗时：", end.Sub(start))
 
 	start = time.Now()
 	// 下载html
@@ -94,7 +94,7 @@ func (amazon *AmazonCategory) GetCategoryInfo() (info models.CategoryInfo, err e
 		return info, err
 	}
 	end = time.Now()
-	log.Println("3. 下载html并解析Price耗时(ms)：", end.Sub(start))
+	log.Println("3. 下载html并解析Price耗时：", end.Sub(start))
 
 	start = time.Now()
 	// 保存截图
@@ -106,7 +106,7 @@ func (amazon *AmazonCategory) GetCategoryInfo() (info models.CategoryInfo, err e
 	}
 	info.Screenshot = filename
 	end = time.Now()
-	log.Println("4. 截图并保存总耗时(s)：", end.Sub(start).Seconds())
+	log.Println("4. 截图并保存总耗时：", end.Sub(start))
 
 	if len(info.Errors) == 0 {
 		info.Status = "SUCCESS"
@@ -175,7 +175,7 @@ func (amazon *AmazonCategory) saveScreenshot(ctx context.Context) (filename stri
 		return
 	}
 	end := time.Now()
-	log.Println("---- 4.1 截图耗时(s)：", end.Sub(start).Seconds())
+	log.Println("---- 4.1 截图耗时：", end.Sub(start).Seconds())
 
 	country := amazon.Category.Country
 	productNo := amazon.Category.ProductNo
@@ -206,7 +206,7 @@ func (amazon *AmazonCategory) saveScreenshot(ctx context.Context) (filename stri
 		return
 	}
 	end = time.Now()
-	log.Println("---- 4.2 上传截图到OSS耗时(s)：", end.Sub(start).Seconds())
+	log.Println("---- 4.2 上传截图到OSS耗时：", end.Sub(start).Seconds())
 
 	return filename, err
 }
