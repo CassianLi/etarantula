@@ -69,7 +69,8 @@ func publishInfo(info models.CategoryInfo) error {
 		return err
 	}
 
-	mq, err := rabbitmq.NewRabbitMQ(viper.GetString("pub-mq.url"), viper.GetString("pub-mq.exchange"), viper.GetString("pub-mq.exchange-type"))
+	mq, err := rabbitmq.NewRabbitMQ(viper.GetString("pub-mq.url"), viper.GetString("pub-mq.exchange"),
+		viper.GetString("pub-mq.exchange-type"), 10*time.Second)
 	if err != nil {
 		fmt.Println("创建消息回传MQ链接失败，Error: ", err)
 		return err
@@ -86,7 +87,7 @@ func publishInfo(info models.CategoryInfo) error {
 
 // Consuming 启动消费者
 func Consuming(url, exchange, exchangeType, queue string) {
-	mq, err := rabbitmq.NewRabbitMQ(url, exchange, exchangeType)
+	mq, err := rabbitmq.NewRabbitMQ(url, exchange, exchangeType, 10*time.Second)
 	defer mq.Close()
 
 	if err != nil {

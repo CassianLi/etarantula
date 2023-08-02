@@ -13,8 +13,8 @@ type RabbitMQ struct {
 	exchangeType string
 }
 
-// NewRabbitMQ 创建一个RabbitMQ实例，如果exchange为空则创建一个默认的exchange。
-func NewRabbitMQ(amqpURI, exchange, exchangeType string) (*RabbitMQ, error) {
+// NewRabbitMQ 创建一个RabbitMQ实例，如果exchange为空则创建一个默认的exchange。heartbeat为心跳间隔，尽量不要设置的太长
+func NewRabbitMQ(amqpURI, exchange, exchangeType string, heartbeat time.Duration) (*RabbitMQ, error) {
 	mq := &RabbitMQ{
 		conn:         nil,
 		channel:      nil,
@@ -23,6 +23,9 @@ func NewRabbitMQ(amqpURI, exchange, exchangeType string) (*RabbitMQ, error) {
 	}
 
 	var err error
+	if heartbeat == 0 {
+		heartbeat = time.Second * 10
+	}
 
 	mq.conn, err = amqp.DialConfig(amqpURI, amqp.Config{
 		Heartbeat: time.Second * 30, // Set the heartbeat interval to 30 seconds

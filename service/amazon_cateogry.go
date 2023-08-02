@@ -175,7 +175,7 @@ func (amazon *AmazonCategory) saveScreenshot(ctx context.Context) (filename stri
 		return
 	}
 	end := time.Now()
-	log.Println("---- 4.1 截图耗时：", end.Sub(start).Seconds())
+	log.Println("---- 4.1 截图耗时：", end.Sub(start))
 
 	country := amazon.Category.Country
 	productNo := amazon.Category.ProductNo
@@ -206,7 +206,7 @@ func (amazon *AmazonCategory) saveScreenshot(ctx context.Context) (filename stri
 		return
 	}
 	end = time.Now()
-	log.Println("---- 4.2 上传截图到OSS耗时：", end.Sub(start).Seconds())
+	log.Println("---- 4.2 上传截图到OSS耗时：", end.Sub(start))
 
 	return filename, err
 }
