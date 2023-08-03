@@ -91,7 +91,6 @@ func (amazon *AmazonCategory) GetCategoryInfo() (info models.CategoryInfo, err e
 	if err != nil {
 		info.Status = PriceError
 		info.Errors = append(info.Errors, err.Error())
-		return info, err
 	}
 	end = time.Now()
 	log.Println("3. 下载html并解析Price耗时：", end.Sub(start))
