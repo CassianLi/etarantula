@@ -161,9 +161,13 @@ func (amazon *AmazonCategory) downloadHtml(ctx context.Context) (html string, er
 
 // 截图并保存OSS
 func (amazon *AmazonCategory) saveScreenshot(ctx context.Context) (filename string, err error) {
-	height, err := utils.GetElementBottomRightHeight(ctx, viper.GetString("amazon.description-selectors"))
-	if err != nil {
-		log.Println("获取description元素高度失败，将截图全屏", err)
+	desSelectors := strings.Split(viper.GetString("amazon.description-selectors"), ",")
+	var height int64
+	for _, selector := range desSelectors {
+		height, err = utils.GetElementBottomRightHeight(ctx, selector)
+		if err == nil && height > 0 {
+			break
+		}
 	}
 
 	start := time.Now()
