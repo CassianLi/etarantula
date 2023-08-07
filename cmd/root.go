@@ -8,6 +8,7 @@ import (
 	"os"
 	"tarantula-v2/app"
 	"tarantula-v2/config"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -25,9 +26,14 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// 初始化配置
 		initGlobalVariables()
+
+		heartbeat := viper.GetInt("mq.heartbeat")
+		if heartbeat == 0 {
+			heartbeat = 30
+		}
 		// 启动消费者
 		go app.Consuming(viper.GetString("mq.url"), viper.GetString("mq.exchange"),
-			viper.GetString("mq.exchangeType"), viper.GetString("mq.queue"))
+			viper.GetString("mq.exchangeType"), viper.GetString("mq.queue"), time.Duration(heartbeat)*time.Second)
 
 		fmt.Println("已城通启动消费者，监听中...")
 		// 永不退出

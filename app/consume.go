@@ -14,6 +14,7 @@ import (
 
 // 消息处理函数
 func handler(msg string) {
+
 	log.Println("收到MQ消息：", msg)
 
 	start := time.Now()
@@ -86,8 +87,8 @@ func publishInfo(info models.CategoryInfo) error {
 }
 
 // Consuming 启动消费者
-func Consuming(url, exchange, exchangeType, queue string) {
-	mq, err := rabbitmq.NewRabbitMQ(url, exchange, exchangeType, 10*time.Second)
+func Consuming(url, exchange, exchangeType, queue string, heartbeat time.Duration) {
+	mq, err := rabbitmq.NewRabbitMQ(url, exchange, exchangeType, heartbeat)
 	defer mq.Close()
 
 	if err != nil {
