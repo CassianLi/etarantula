@@ -223,8 +223,10 @@ func (amazon *AmazonCategory) parseProductInfo(html string, info *models.Categor
 
 	var text string
 	for _, selector := range priceSelectorsArr {
+		log.Println("range selector: ", selector)
 		ele := doc.Find(selector)
-		if ele != nil {
+		if ele.Nodes != nil {
+			log.Println("match selector: ", selector)
 			text = ele.Text()
 			break
 		}
