@@ -71,7 +71,7 @@ func publishInfo(info models.CategoryInfo) error {
 	}
 
 	mq, err := rabbitmq.NewRabbitMQ(viper.GetString("pub-mq.url"), viper.GetString("pub-mq.exchange"),
-		viper.GetString("pub-mq.exchange-type"), 10*time.Second)
+		viper.GetString("pub-mq.exchange-type"), 0)
 	if err != nil {
 		fmt.Println("创建消息回传MQ链接失败，Error: ", err)
 		return err

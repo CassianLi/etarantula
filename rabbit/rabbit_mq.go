@@ -24,18 +24,16 @@ func NewRabbitMQ(amqpURI, exchange, exchangeType string, heartbeat time.Duration
 	}
 
 	var err error
-	if heartbeat == 0 {
-		heartbeat = time.Second * 10
-	}
+	if heartbeat > 0 {
+		fmt.Println("Heartbeat interval set to:", heartbeat)
 
-	mq.conn, err = amqp.DialConfig(amqpURI, amqp.Config{
-		Heartbeat: time.Second * 30, // Set the heartbeat interval to 30 seconds
-	})
-	if err != nil {
-		return nil, err
+		mq.conn, err = amqp.DialConfig(amqpURI, amqp.Config{
+			Heartbeat: time.Second * 30, // Set the heartbeat interval to 30 seconds
+		})
+		if err != nil {
+			return nil, err
+		}
 	}
-
-	fmt.Println("Heartbeat interval set to:", heartbeat)
 
 	mq.channel, err = mq.conn.Channel()
 	if err != nil {
@@ -57,8 +55,10 @@ func NewRabbitMQ(amqpURI, exchange, exchangeType string, heartbeat time.Duration
 		}
 	}
 
-	// 启动心跳发送并记录日志
-	go mq.startHeartbeatSender(heartbeat)
+	if heartbeat > 0 {
+		// 启动心跳发送并记录日志
+		go mq.startHeartbeatSender(heartbeat)
+	}
 
 	return mq, nil
 }
