@@ -26,13 +26,15 @@ func NewRabbitMQ(amqpURI, exchange, exchangeType string, heartbeat time.Duration
 	var err error
 	if heartbeat > 0 {
 		fmt.Println("Heartbeat interval set to:", heartbeat)
-
 		mq.conn, err = amqp.DialConfig(amqpURI, amqp.Config{
-			Heartbeat: time.Second * 30, // Set the heartbeat interval to 30 seconds
+			Heartbeat: heartbeat, // Set the heartbeat interval to 30 seconds
 		})
-		if err != nil {
-			return nil, err
-		}
+	} else {
+		mq.conn, err = amqp.Dial(amqpURI)
+	}
+
+	if err != nil {
+		return nil, err
 	}
 
 	mq.channel, err = mq.conn.Channel()
