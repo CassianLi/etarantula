@@ -161,13 +161,9 @@ func (amazon *AmazonCategory) downloadHtml(ctx context.Context) (html string, er
 
 // 截图并保存OSS
 func (amazon *AmazonCategory) saveScreenshot(ctx context.Context) (filename string, err error) {
-	desSelectors := strings.Split(viper.GetString("amazon.description-selectors"), ",")
-	var height int64
-	for _, selector := range desSelectors {
-		height, err = utils.GetElementBottomRightHeight(ctx, selector)
-		if err == nil && height > 0 {
-			break
-		}
+	height := viper.GetInt64("amazon.screenshot-height")
+	if height == 0 {
+		height = 960
 	}
 
 	start := time.Now()

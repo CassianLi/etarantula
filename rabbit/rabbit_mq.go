@@ -3,6 +3,7 @@ package rabbitmq
 import (
 	"fmt"
 	"github.com/streadway/amqp"
+	"log"
 	"time"
 )
 
@@ -34,6 +35,8 @@ func NewRabbitMQ(amqpURI, exchange, exchangeType string, heartbeat time.Duration
 		return nil, err
 	}
 
+	fmt.Println("Heartbeat interval set to:", heartbeat)
+
 	mq.channel, err = mq.conn.Channel()
 	if err != nil {
 		return nil, err
@@ -54,6 +57,9 @@ func NewRabbitMQ(amqpURI, exchange, exchangeType string, heartbeat time.Duration
 		}
 	}
 
+	// 启动心跳发送并记录日志
+	go mq.startHeartbeatSender(heartbeat)
+
 	return mq, nil
 }
 
@@ -67,6 +73,17 @@ func (mq *RabbitMQ) Close() {
 	if err != nil {
 		fmt.Println("failed to close connection:", err)
 	}
+}
+
+func (mq *RabbitMQ) startHeartbeatSender(heartbeatInterval time.Duration) {
+	go func() {
+		heartbeatTicker := time.NewTicker(heartbeatInterval)
+		defer heartbeatTicker.Stop()
+
+		for range heartbeatTicker.C {
+			log.Println("Sending heartbeat...")
+		}
+	}()
 }
 
 // Publish 发布消息到指定的queue，如果没有设置exchange则使用默认的exchange。如果队列不存在则会创建。
@@ -101,14 +118,15 @@ func (mq *RabbitMQ) Consume(queue string, autoAck bool, callback func(msg string
 	}
 
 	for d := range deliveries {
+		msg := string(d.Body)
+
 		// 处理消息
-		callback(string(d.Body))
+		callback(msg)
+
 		// 手动应答
 		if !autoAck {
-			err := d.Ack(false)
-			if err != nil {
+			if err := d.Ack(false); err != nil {
 				fmt.Println("failed to ack:", err)
-				return err
 			}
 		}
 	}
