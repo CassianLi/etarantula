@@ -108,7 +108,7 @@ func (amazon *AmazonCategory) GetCategoryInfo() (info models.CategoryInfo, err e
 	log.Println("4. 截图并保存总耗时：", end.Sub(start))
 
 	if len(info.Errors) == 0 {
-		info.Status = "SUCCESS"
+		info.Status = Success
 	}
 
 	return info, err
