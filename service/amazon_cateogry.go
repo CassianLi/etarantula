@@ -232,10 +232,7 @@ func (amazon *AmazonCategory) parseProductInfo(html string, info *models.Categor
 		}
 	}
 	text = strings.Trim(text, " \n\t")
-	fmt.Println("trime text: ", text)
-
 	text = strings.ReplaceAll(text, ",", ".")
-	fmt.Println("replace text: ", text)
 
 	numbers := utils.GetFloat64sFromString(text)
 
