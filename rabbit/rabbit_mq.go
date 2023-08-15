@@ -1,6 +1,7 @@
 package rabbitmq
 
 import (
+	"errors"
 	"fmt"
 	"github.com/streadway/amqp"
 	"log"
@@ -127,11 +128,27 @@ func (mq *RabbitMQ) Consume(queue string, autoAck bool, callback func(msg string
 
 		// 手动应答
 		if !autoAck {
-			if err := d.Ack(false); err != nil {
-				fmt.Println("failed to ack:", err)
+			// 重复发送Ack确认消息
+			if err := sendAckMsg(d, 5, 5*time.Second); err != nil {
+				log.Printf("failed to ack msg: %s, err: %v", msg, err)
 			}
 		}
 	}
 
 	return nil
+}
+
+// 发送Ack确认消息，设置重复次数和间隔时间
+func sendAckMsg(delivery amqp.Delivery, retryCount int, retryInterval time.Duration) error {
+	// 重复发送Ack确认消息
+	for i := 0; i < retryCount; i++ {
+		if err := delivery.Ack(false); err != nil {
+			log.Printf("failed to ack, times: %d, err: %v", i, err)
+			time.Sleep(retryInterval)
+		} else {
+			return nil
+		}
+	}
+
+	return errors.New(fmt.Sprintf("failed to ack after %d retries", retryCount))
 }
