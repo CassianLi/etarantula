@@ -234,7 +234,8 @@ func (amazon *AmazonCategory) parseProductInfo(html string, info *models.Categor
 	text = strings.Trim(text, " \n\t")
 	text = strings.ReplaceAll(text, ",", ".")
 
-	numbers := utils.GetFloat64sFromString(text)
+	//numbers := utils.GetFloat64sFromString(text)
+	numbers := utils.GetPriceFromString(text, "€")
 
 	if len(numbers) > 0 {
 		// float64转string
