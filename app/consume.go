@@ -89,7 +89,6 @@ func publishInfo(info models.CategoryInfo) error {
 // Consuming 启动消费者
 func Consuming(url, exchange, exchangeType, queue string, heartbeat time.Duration) {
 	mq, err := rabbitmq.NewRabbitMQ(url, exchange, exchangeType, heartbeat)
-	defer mq.Close()
 
 	if err != nil {
 		fmt.Println("创建MQ链接失败，Error: ", err)
@@ -101,6 +100,7 @@ func Consuming(url, exchange, exchangeType, queue string, heartbeat time.Duratio
 
 	if err != nil {
 		fmt.Println("消费MQ消息失败，Error: ", err)
+		mq.Close()
 		return
 	}
 }
