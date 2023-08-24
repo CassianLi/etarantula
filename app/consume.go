@@ -3,11 +3,12 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/JokerLiAnother/rabbitmq"
 	"github.com/spf13/viper"
 	"log"
+	"os"
 	"strings"
 	"tarantula-v2/models"
-	rabbitmq "tarantula-v2/rabbit"
 	"tarantula-v2/service"
 	"time"
 )
@@ -70,15 +71,18 @@ func publishInfo(info models.CategoryInfo) error {
 		return err
 	}
 
-	mq, err := rabbitmq.NewRabbitMQ(viper.GetString("pub-mq.url"), viper.GetString("pub-mq.exchange"),
-		viper.GetString("pub-mq.exchange-type"), 0)
+	mq, err := rabbitmq.NewDefaultRabbitMQ(viper.GetString("mq.publish.url"),
+		viper.GetString("mq.publish.exchange"),
+		viper.GetString("mq.publish.exchange-type"),
+		viper.GetString("mq.publish.queue"),
+		true)
 	if err != nil {
 		fmt.Println("创建消息回传MQ链接失败，Error: ", err)
 		return err
 	}
 	defer mq.Close()
 
-	err = mq.Publish(viper.GetString("pub-mq.queue"), infoJson)
+	err = mq.Publish(infoJson)
 	if err != nil {
 		fmt.Println("Error publishing message, err: ", err)
 		return err
@@ -87,8 +91,20 @@ func publishInfo(info models.CategoryInfo) error {
 }
 
 // Consuming 启动消费者
-func Consuming(url, exchange, exchangeType, queue string, heartbeat time.Duration) {
-	mq, err := rabbitmq.NewRabbitMQ(url, exchange, exchangeType, heartbeat)
+func Consuming(url, exchange, exchangeType, queue string, heartbeat, reConnectInterval, maxReconnects int, closeExist bool) {
+	mq, err := rabbitmq.NewRecoverRabbitMQ(url, exchange, exchangeType, queue,
+		true,
+		time.Duration(heartbeat)*time.Second,
+		time.Duration(reConnectInterval)*time.Second,
+		maxReconnects)
+	// 退出时关闭MQ链接
+	defer func() {
+		mq.Close()
+		if closeExist {
+			log.Println("关闭MQ链接，退出进程...")
+			os.Exit(-1)
+		}
+	}()
 
 	if err != nil {
 		fmt.Println("创建MQ链接失败，Error: ", err)
@@ -96,11 +112,9 @@ func Consuming(url, exchange, exchangeType, queue string, heartbeat time.Duratio
 	}
 
 	fmt.Println("创建MQ链接成功，开始消费...")
-	err = mq.Consume(queue, false, handler)
-
+	err = mq.Consume(false, handler)
 	if err != nil {
 		fmt.Println("消费MQ消息失败，Error: ", err)
-		mq.Close()
 		return
 	}
 }

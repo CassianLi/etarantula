@@ -5,13 +5,11 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"os"
 	"tarantula-v2/app"
 	"tarantula-v2/config"
-	"time"
-
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var cfgFile string
@@ -27,13 +25,16 @@ var rootCmd = &cobra.Command{
 		// 初始化配置
 		initGlobalVariables()
 
-		heartbeat := viper.GetInt("mq.heartbeat")
-		if heartbeat == 0 {
-			heartbeat = 30
-		}
 		// 启动消费者
-		go app.Consuming(viper.GetString("mq.url"), viper.GetString("mq.exchange"),
-			viper.GetString("mq.exchangeType"), viper.GetString("mq.queue"), time.Duration(heartbeat)*time.Second)
+		go app.Consuming(viper.GetString("mq.consumer.url"),
+			viper.GetString("mq.consumer.exchange"),
+			viper.GetString("mq.consumer.exchangeType"),
+			viper.GetString("mq.consumer.queue"),
+			viper.GetInt("mq.consumer.heartbeat"),
+			viper.GetInt("mq.consumer.reconnect-interval"),
+			viper.GetInt("mq.consumer.max-reconnects"),
+			viper.GetBool("mq.consumer.close-exist"),
+		)
 
 		fmt.Println("已城通启动消费者，监听中...")
 		// 永不退出

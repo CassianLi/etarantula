@@ -13,6 +13,7 @@ require (
 )
 
 require (
+	github.com/JokerLiAnother/rabbitmq v1.0.0 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/chromedp/cdproto v0.0.0-20230220211738-2b1ec77315c9 // indirect
 	github.com/chromedp/sysutil v1.0.0 // indirect
