@@ -75,7 +75,7 @@ func publishInfo(info models.CategoryInfo) error {
 		viper.GetString("mq.publish.exchange"),
 		viper.GetString("mq.publish.exchange-type"),
 		viper.GetString("mq.publish.queue"),
-		true)
+		false)
 	if err != nil {
 		fmt.Println("创建消息回传MQ链接失败，Error: ", err)
 		return err
@@ -93,7 +93,7 @@ func publishInfo(info models.CategoryInfo) error {
 // Consuming 启动消费者
 func Consuming(url, exchange, exchangeType, queue string, heartbeat, reConnectInterval, maxReconnects int, closeExist bool) {
 	mq, err := rabbitmq.NewRecoverRabbitMQ(url, exchange, exchangeType, queue,
-		true,
+		false,
 		time.Duration(heartbeat)*time.Second,
 		time.Duration(reConnectInterval)*time.Second,
 		maxReconnects)
