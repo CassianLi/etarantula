@@ -3,7 +3,7 @@ module tarantula-v2
 go 1.19
 
 require (
-	github.com/JokerLiAnother/rabbitmq v1.0.0
+	github.com/JokerLiAnother/rabbitmq v1.1.0
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.8+incompatible
 	github.com/chromedp/chromedp v0.9.1

@@ -21,21 +21,3 @@ type CategoryInfo struct {
 	Status       string   `json:"status"`
 	Errors       []string `json:"errors"`
 }
-
-type PriceSelector struct {
-	Whole    string `mapstracture:"whole"`
-	Fraction string `mapstracture:"fraction"`
-	Tag      string `mapstracture:"tag"`
-}
-
-type DetailSelector struct {
-	Section string `mapstracture:"section"`
-	Tr      string `mapstracture:"tr"`
-	Tag     string `mapstracture:"tag"`
-}
-
-type AmazonConfig struct {
-	Urls            map[string]string `mapstracture:"urls"`
-	PriceSelectors  []PriceSelector   `mapstracture:"price-selectors"`
-	DetailSelectors []DetailSelector  `mapstracture:"detail-selectors"`
-}

@@ -1,4 +1,4 @@
-package app
+package application
 
 import (
 	"encoding/json"
@@ -13,8 +13,8 @@ import (
 	"time"
 )
 
-// 消息处理函数
-func handler(msg string) {
+// consumeHandler 消息处理函数
+func consumeHandler(msg string) {
 
 	log.Println("收到MQ消息：", msg)
 
@@ -91,30 +91,41 @@ func publishInfo(info models.CategoryInfo) error {
 }
 
 // Consuming 启动消费者
-func Consuming(url, exchange, exchangeType, queue string, heartbeat, reConnectInterval, maxReconnects int, closeExist bool) {
-	mq, err := rabbitmq.NewRecoverRabbitMQ(url, exchange, exchangeType, queue,
-		false,
-		time.Duration(heartbeat)*time.Second,
-		time.Duration(reConnectInterval)*time.Second,
-		maxReconnects)
-	// 退出时关闭MQ链接
-	defer func() {
-		mq.Close()
-		if closeExist {
-			log.Println("关闭MQ链接，退出进程...")
-			os.Exit(-1)
-		}
-	}()
+func Consuming() {
+	mq, err := rabbitmq.NewRabbitMQ(
+		viper.GetString("mq.consumer.url"),
+		viper.GetString("mq.consumer.exchange"),
+		viper.GetString("mq.consumer.exchange-type"),
+		viper.GetString("mq.consumer.queue"),
+		rabbitmq.ConnectionOptions{
+			Heartbeat:         time.Duration(viper.GetInt("mq.consumer.heartbeat")) * time.Second,
+			ReConnectInterval: time.Duration(viper.GetInt("mq.consumer.reconnect-interval")) * time.Second,
+			MaxReconnects:     viper.GetInt("mq.consumer.max-reconnects"),
+		},
+		true,
+		rabbitmq.DeclareParams{Durable: true},
+	)
 
 	if err != nil {
 		fmt.Println("创建MQ链接失败，Error: ", err)
 		return
 	}
 
-	fmt.Println("创建MQ链接成功，开始消费...")
-	err = mq.Consume(false, handler)
-	if err != nil {
-		fmt.Println("消费MQ消息失败，Error: ", err)
-		return
-	}
+	// 退出时关闭MQ链接
+	defer func() {
+		mq.Close()
+		if viper.GetBool("mq.consumer.close-exist") {
+			log.Println("关闭MQ链接，退出进程...")
+			os.Exit(-1)
+		}
+	}()
+
+	go func() {
+		log.Printf("启动消费者，监听中...")
+		err := mq.Consume(false, false, true, consumeHandler)
+		if err != nil {
+			fmt.Println("消费MQ消息失败，Error: ", err)
+			return
+		}
+	}()
 }

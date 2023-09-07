@@ -50,7 +50,8 @@ func GetPriceFromString(str string, currencySymbol string) []float64 {
 
 	cur := regexp.QuoteMeta(currencySymbol)
 	// 构建正则表达式，匹配前后有货币符号的价格信息
-	re := regexp.MustCompile(fmt.Sprintf(`(?:%s([\d.]+)|([\d.]+)%s)`, cur, cur))
+	re := regexp.MustCompile(fmt.Sprintf(`(?:%s\s*([\d.]+)|([\d.]+)\s*%s)`, cur, cur))
+	fmt.Println("re: ", re)
 	priceMatches := re.FindAllStringSubmatch(str, -1)
 
 	// 遍历匹配到的字符串片段，将数字部分解析为浮点数

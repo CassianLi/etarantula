@@ -137,3 +137,27 @@ func GetElementBottomRightHeight(ctx context.Context, selector string) (int64, e
 
 	return int64(height), nil
 }
+
+// SetSelectorDisplayNone 设置selector 不显示
+func SetSelectorDisplayNone(ctx context.Context, selector string) error {
+	script := fmt.Sprintf(`
+		(function() {
+			const elem = document.querySelector('%s');
+			elem.style.display = 'none';
+		})();
+	`, selector)
+
+	return chromedp.Run(ctx, chromedp.Evaluate(script, nil))
+}
+
+// CaptureScreenshotWithContextAndSelector 以指定的上下文和选择器截取页面截图，返回截图内容
+func CaptureScreenshotWithContextAndSelector(ctx context.Context, selector string) ([]byte, error) {
+	var buf []byte
+	if err := chromedp.Run(ctx,
+		chromedp.Screenshot(selector, &buf, chromedp.NodeVisible),
+	); err != nil {
+		log.Fatal(err)
+	}
+
+	return buf, nil
+}

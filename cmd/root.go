@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
-	"tarantula-v2/app"
+	"tarantula-v2/application"
 	"tarantula-v2/config"
 )
 
@@ -26,17 +26,8 @@ var rootCmd = &cobra.Command{
 		initGlobalVariables()
 
 		// 启动消费者
-		go app.Consuming(viper.GetString("mq.consumer.url"),
-			viper.GetString("mq.consumer.exchange"),
-			viper.GetString("mq.consumer.exchangeType"),
-			viper.GetString("mq.consumer.queue"),
-			viper.GetInt("mq.consumer.heartbeat"),
-			viper.GetInt("mq.consumer.reconnect-interval"),
-			viper.GetInt("mq.consumer.max-reconnects"),
-			viper.GetBool("mq.consumer.close-exist"),
-		)
+		application.Consuming()
 
-		fmt.Println("已城通启动消费者，监听中...")
 		// 永不退出
 		select {}
 	},
