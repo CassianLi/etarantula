@@ -74,6 +74,7 @@ func (ebay *EbayCategory) GetCategoryInfo() (info models.CategoryInfo, err error
 		info.Errors = append(info.Errors, "下载html失败")
 		return info, err
 	}
+	end = time.Now()
 
 	log.Println("3. 下载html耗时：", end.Sub(start))
 
