@@ -130,8 +130,11 @@ func (ebay *EbayCategory) createContext() (ctx context.Context, cancel context.C
 
 // 下载html页面
 func (ebay *EbayCategory) downloadHtml(ctx context.Context) (html string, err error) {
+	contentSel := viper.GetString("ebay.content-selector")
+
 	// 获取html
-	html, err = utils.GetHtml(ctx)
+	//html, err = utils.GetHtml(ctx)
+	html, err = utils.GetHtmlBySelector(ctx, contentSel)
 	if err != nil {
 		log.Println("get html error: ", err)
 		return html, err
@@ -160,6 +163,7 @@ func (ebay *EbayCategory) parseProductInfo(html string, info *models.CategoryInf
 			break
 		}
 	}
+	fmt.Println("text: ", text)
 	text = strings.Trim(text, " \n\t")
 	text = strings.ReplaceAll(text, ",", ".")
 

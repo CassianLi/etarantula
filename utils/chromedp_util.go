@@ -108,6 +108,16 @@ func GetHtml(ctx context.Context) (string, error) {
 	return html, nil
 }
 
+// GetHtmlBySelector chromedp 获取指定选择器的html
+func GetHtmlBySelector(ctx context.Context, selector string) (string, error) {
+	var html string
+	err := chromedp.Run(ctx, chromedp.OuterHTML(selector, &html))
+	if err != nil {
+		return "", err
+	}
+	return html, nil
+}
+
 // GetElementBottomRightHeight 获取元素底部距离页面顶部的高度
 func GetElementBottomRightHeight(ctx context.Context, selector string) (int64, error) {
 	// 指定超时时间，等待元素加载完成
