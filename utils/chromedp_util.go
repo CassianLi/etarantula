@@ -77,6 +77,12 @@ func Navigate(ctx context.Context, url string) error {
 	return chromedp.Run(ctx, chromedp.Navigate(url))
 }
 
+// NavigateAndWait 打开URL,等待selector元素加载完成
+func NavigateAndWait(ctx context.Context, url string, selector string) error {
+	// navigate to the URL
+	return chromedp.Run(ctx, chromedp.Navigate(url), chromedp.WaitVisible(selector))
+}
+
 // GetScreenshot chromedp 获取当前页面截图，并返回base64编码
 func GetScreenshot(ctx context.Context, height int64) ([]byte, error) {
 	if height == 0 {
