@@ -75,6 +75,9 @@ func (ebay *EbayCategory) GetCategoryInfo() (info models.CategoryInfo, err error
 		return info, err
 	}
 
+	log.Println("3. 下载html耗时：", end.Sub(start))
+
+	start = time.Now()
 	// 解析html
 	err = ebay.parseProductInfo(html, &info)
 	if err != nil {
@@ -82,7 +85,7 @@ func (ebay *EbayCategory) GetCategoryInfo() (info models.CategoryInfo, err error
 		info.Errors = append(info.Errors, err.Error())
 	}
 	end = time.Now()
-	log.Println("3. 下载html并解析Price耗时：", end.Sub(start))
+	log.Println("4. 解析Price耗时：", end.Sub(start))
 
 	start = time.Now()
 	// 保存截图
@@ -94,7 +97,7 @@ func (ebay *EbayCategory) GetCategoryInfo() (info models.CategoryInfo, err error
 	}
 	info.Screenshot = filename
 	end = time.Now()
-	log.Println("4. 截图并保存总耗时：", end.Sub(start))
+	log.Println("5. 截图并保存总耗时：", end.Sub(start))
 
 	if len(info.Errors) == 0 {
 		info.Status = Success
@@ -170,8 +173,6 @@ func (ebay *EbayCategory) parseProductInfo(html string, info *models.CategoryInf
 		return errors.New("解析价格失败, text: " + text)
 	}
 	return nil
-
-	return nil
 }
 
 // 保存截图
@@ -191,7 +192,7 @@ func (ebay *EbayCategory) saveScreenshot(ctx context.Context) (filename string, 
 	}
 
 	end := time.Now()
-	log.Println("---- 4.1 截图耗时：", end.Sub(start))
+	log.Println("---- 5.1 截图耗时：", end.Sub(start))
 
 	country := ebay.Category.Country
 	productNo := ebay.Category.ProductNo
@@ -222,7 +223,7 @@ func (ebay *EbayCategory) saveScreenshot(ctx context.Context) (filename string, 
 		return
 	}
 	end = time.Now()
-	log.Println("---- 4.2 上传截图到OSS耗时：", end.Sub(start))
+	log.Println("---- 5.2 上传截图到OSS耗时：", end.Sub(start))
 
 	return filename, err
 }
