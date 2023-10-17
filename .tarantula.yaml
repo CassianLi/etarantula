@@ -3,50 +3,54 @@ debug: true
 # 是否启用全局context，如果启用，将会在每个请求中注入一个全局context，并在每次打开网页后不关闭浏览器页面。默认为false
 global-context: true
 
+# 是否保存截图到本地
+save-screenshot-on-disk: true
+
 # ossutil credentials and bucket
 oss:
-  endpoint: " "
-  access-key-id: " "
-  access-key-secret: " "
-  bucket: " "
+  endpoint: "oss-xx-xxxxx.aliyuncs.com"
+  access-key-id: ""
+  access-key-secret: ""
+  bucket: "bucketName"
   # path
-  path: " "
+  path: ""
 
 amazon:
   # Amazon product details link
   urls:
-    # https: " "
-    de: " "
-    es: " "
-    it: " "
-    fr: " "
-  price-selectors: " "
-  description-selectors: " "
+    # https://www.amazon.de/gp/product/B0CCVP2LGJ?language=en_GB&currency=EUR
+    de: https://www.amazon.de/gp/product/ASIN?language=en_GB&currency=EUR
+    es: https://www.amazon.es/gp/product/ASIN?language=en_GB&currency=EUR
+    it: https://www.amazon.it/gp/product/ASIN?language=en_GB&currency=EUR
+    fr: https://www.amazon.fr/gp/product/ASIN?language=en_GB&currency=EUR
+  price-selectors: "#corePrice_feature_div,#price_inside_buybox,#corePriceDisplay_desktop_feature_div > div,#corePrice_desktop > div"
+  screenshot-height: 1080
+
+ebay:
+  url: https://www.ebay.de/itm/ASIN
+  price-selectors: "#mainContent div.x-price-primary"
+  # ebay 图片需要高一些，否则会被相似商品遮挡
+  screenshot-height: 1680
 
 mq:
-  url: " "
-  queue: " "
-  exchange: " "
-  exchange-type: " "
+  consumer:
+    url: amqp://USER:PASSWORD@IP:5672
+    exchange:
+    exchange-type: direct
+    queue: queueName
+    # heartbeat: 40s, heartbeat should be less than 60s,more then service cost
+    heartbeat: 10
+    # reconnect delay: 5s, 0 means no reconnection
+    reconnect-interval: 5
+    # max reconnects: 10, 0 means infinite
+    max-reconnects: 10
+    # ma prefetch count
+    pre-fetch-count: 1
+    # mq connection close exit
+    close-exit: true
 
-# info 结果回调队列
-pub-mq:
-  url: " "
-  queue: " "
-  exchange: " "
-  exchange-type: " "
-
-email:
-  host: " "
-  password: " "
-  port: " "
-  user: " "
-
-waring-email:
-  to:
-    - ljr@asllgg.com
-  cc:
-  #    - york@asldutch.com,YorkZhou
-  subject: " "
-  body: " "
-
+  publish:
+    url: amqp://USER:PASSWORD@IP:5672
+    queue: screenshot_callback
+    exchange:
+    exchange-type: direct

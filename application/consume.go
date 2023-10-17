@@ -103,7 +103,7 @@ func Consuming() {
 			MaxReconnects:     viper.GetInt("mq.consumer.max-reconnects"),
 		},
 		true,
-		rabbitmq.DeclareParams{Durable: true},
+		rabbitmq.DeclareParams{Durable: true, PrefetchCount: viper.GetInt("mq.consumer.prefetch-count")},
 	)
 
 	if err != nil {
