@@ -51,6 +51,6 @@ mq:
 
   publish:
     url: amqp://USER:PASSWORD@IP:5672
-    queue: screenshot_callback
+    queue: queueName1
     exchange:
     exchange-type: direct
