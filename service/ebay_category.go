@@ -55,6 +55,13 @@ func (ebay *EbayCategory) GetCategoryInfo() (info models.CategoryInfo, err error
 	log.Println("1. 获取weblink耗时：", end.Sub(start))
 
 	start = time.Now()
+	//err = utils.Navigate(ctx, url)
+	//if err != nil {
+	//	info.Status = PageError
+	//	info.Errors = append(info.Errors, "1.打页面失败")
+	//	return info, err
+	//}
+	//
 	err = utils.NavigateAndWait(ctx, url, viper.GetString("ebay.content-selector"), 10*time.Second)
 	if err != nil {
 		log.Println("页面超时", err)

@@ -80,9 +80,17 @@ func Navigate(ctx context.Context, url string) error {
 // NavigateAndWait 打开URL,等待selector元素加载完成
 func NavigateAndWait(ctx context.Context, url string, selector string, timeout time.Duration) error {
 	// 创建带超时的上下文
-	tctx, _ := context.WithTimeout(ctx, timeout)
+	waitCtx, waitCancel := context.WithTimeout(ctx, timeout)
+	defer waitCancel()
+
 	// navigate to the URL
-	return chromedp.Run(tctx, chromedp.Navigate(url), chromedp.WaitVisible(selector))
+	err := chromedp.Run(ctx, chromedp.Navigate(url))
+	if err != nil {
+		return err
+	}
+
+	// 等待selector元素加载完成，使用单独的上下文
+	return chromedp.Run(waitCtx, chromedp.WaitVisible(selector))
 }
 
 // GetScreenshot chromedp 获取当前页面截图，并返回base64编码
