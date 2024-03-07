@@ -80,8 +80,7 @@ func Navigate(ctx context.Context, url string) error {
 // NavigateAndWait 打开URL,等待selector元素加载完成
 func NavigateAndWait(ctx context.Context, url string, selector string, timeout time.Duration) error {
 	// 创建带超时的上下文
-	tctx, tcancel := context.WithTimeout(ctx, timeout)
-	defer tcancel()
+	tctx, _ := context.WithTimeout(ctx, timeout)
 	// navigate to the URL
 	return chromedp.Run(tctx, chromedp.Navigate(url), chromedp.WaitVisible(selector))
 }
