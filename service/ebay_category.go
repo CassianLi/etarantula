@@ -150,6 +150,25 @@ func (ebay *EbayCategory) downloadHtml(ctx context.Context) (html string, err er
 	return html, err
 }
 
+// 判断当前是否是非欧元售价，如果是非欧元售价获取Ca. 欧元对应售价
+func (ebay *EbayCategory) getEurPrice(doc *goquery.Document, text string) string {
+	// 判断是否是欧元售价
+	if strings.Contains(text, "EUR") || strings.Contains(text, "€") {
+		return text
+	}
+
+	// 获取Ca. 补充售价
+	ps := viper.GetString("ebay.price-approx-selector")
+	fmt.Println("price-approx-selector: ", ps)
+	ele := doc.Find(ps)
+	if ele.Nodes != nil {
+		fmt.Println("match selector: ", ps)
+		return ele.Text()
+	}
+	fmt.Println("price-approx-selector not match, return old price not-eur: ", ps)
+	return strings.ReplaceAll(text, "Ca.", "")
+}
+
 // 解析html页面，获取产品信息
 func (ebay *EbayCategory) parseProductInfo(html string, info *models.CategoryInfo) error {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
@@ -170,8 +189,17 @@ func (ebay *EbayCategory) parseProductInfo(html string, info *models.CategoryInf
 			break
 		}
 	}
-	fmt.Println("text: ", text)
+	fmt.Println("old price text: ", text)
+
+	text = ebay.getEurPrice(doc, text)
+	fmt.Println("Ca. price text: ", text)
+
 	text = strings.Trim(text, " \n\t")
+
+	// 欧洲数字千分符写法：1.459,19
+	if strings.Contains(text, ".") {
+		text = strings.ReplaceAll(text, ".", "")
+	}
 	text = strings.ReplaceAll(text, ",", ".")
 
 	//numbers := utils.GetFloat64sFromString(text)
