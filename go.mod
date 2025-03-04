@@ -1,4 +1,4 @@
-module tarantula-v2
+module etarantula
 
 go 1.19
 

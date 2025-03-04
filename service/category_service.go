@@ -1,10 +1,11 @@
 package service
 
 import (
+	"etarantula/models"
 	"fmt"
-	"github.com/spf13/viper"
 	"log"
-	"tarantula-v2/models"
+
+	"github.com/spf13/viper"
 )
 
 // NewCategoryService 创建service

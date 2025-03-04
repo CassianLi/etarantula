@@ -8,15 +8,15 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
-	"tarantula-v2/application"
-	"tarantula-v2/config"
+	"etarantula/application"
+	"etarantula/config"
 )
 
 var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "tarantula-v2",
+	Use:   "etarantula",
 	Short: "通过Amazon 商品详情页面获取商品信息截图",
 	Long:  `执行命令将启动Rabbit 客户端通过监听指定消息队列来获取品类信息的查询请求. 例如：`,
 	// Uncomment the following line if your bare application
@@ -66,10 +66,10 @@ func initConfig() {
 		home, err := os.UserHomeDir()
 		cobra.CheckErr(err)
 
-		// Search config in home directory with name ".tarantula-v2" (without extension).
+		// Search config in home directory with name ".etarantula" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigType("yaml")
-		viper.SetConfigName(".tarantula-v2")
+		viper.SetConfigName(".etarantula")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match

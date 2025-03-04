@@ -3,18 +3,19 @@ package service
 import (
 	"context"
 	"errors"
+	"etarantula/config"
+	"etarantula/models"
+	"etarantula/ossutil"
+	"etarantula/utils"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/spf13/viper"
 	"log"
 	"os"
 	"strconv"
 	"strings"
-	"tarantula-v2/config"
-	"tarantula-v2/models"
-	"tarantula-v2/ossutil"
-	"tarantula-v2/utils"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/spf13/viper"
 )
 
 type EbayCategory struct {
@@ -215,9 +216,10 @@ func (ebay *EbayCategory) parseProductInfo(html string, info *models.CategoryInf
 	return nil
 }
 
-// 保存截图
-func (ebay *EbayCategory) saveScreenshot(ctx context.Context) (filename string, err error) {
+// 以固定高度截图
+func (ebay *EbayCategory) getScreenshotByHeight(ctx context.Context) (bytes []byte, err error) {
 	height := viper.GetInt64("ebay.screenshot-height")
+
 	if height == 0 {
 		height = 960
 	}
@@ -225,14 +227,46 @@ func (ebay *EbayCategory) saveScreenshot(ctx context.Context) (filename string, 
 	start := time.Now()
 
 	// 截图
-	bytes, err := utils.GetScreenshot(ctx, height)
+	bys, err := utils.GetScreenshot(ctx, height)
 	if err != nil {
-		ebay.Errors = append(ebay.Errors, "截图失败")
-		return
+		return bys, err
 	}
 
 	end := time.Now()
-	log.Println("---- 5.1 截图耗时：", end.Sub(start))
+	log.Println("---- 5.1 以固定高度截图，截图耗时：", end.Sub(start))
+
+	return bys, err
+}
+
+// 以selector截图
+func (ebay *EbayCategory) getScreenshotBySelector(ctx context.Context) (bytes []byte, err error) {
+	selector := viper.GetString("ebay.screenshot-selector")
+
+	start := time.Now()
+
+	bys, err := utils.GetScreenshotBySelector(ctx, selector)
+	if err != nil {
+		return bys, err
+	}
+
+	end := time.Now()
+	log.Println("---- 5.1 以selector截图，截图耗时：", end.Sub(start))
+
+	return bys, err
+}
+
+// 保存截图
+func (ebay *EbayCategory) saveScreenshot(ctx context.Context) (filename string, err error) {
+	// 可根据需要选择：
+	// 1. 以固定高度截图
+	// 或者
+	// 2. 以selector截图
+	// bytes, err := ebay.getScreenshotByHeight(ctx)
+	bytes, err := ebay.getScreenshotBySelector(ctx)
+	if err != nil {
+		ebay.Errors = append(ebay.Errors, "截图失败")
+		return "", err
+	}
 
 	country := ebay.Category.Country
 	productNo := ebay.Category.ProductNo
@@ -248,7 +282,7 @@ func (ebay *EbayCategory) saveScreenshot(ctx context.Context) (filename string, 
 	}
 
 	log.Println("开始上传截图到OSS...")
-	start = time.Now()
+	start := time.Now()
 	ali, err := ossutil.NewAliOss(viper.GetString("oss.endpoint"), viper.GetString("oss.access-key-id"), viper.GetString("oss.access-key-secret"))
 	if err != nil {
 		log.Println("创建OSS客户端失败", err)
@@ -262,7 +296,7 @@ func (ebay *EbayCategory) saveScreenshot(ctx context.Context) (filename string, 
 		ebay.Errors = append(ebay.Errors, "上传截图到OSS失败")
 		return
 	}
-	end = time.Now()
+	end := time.Now()
 	log.Println("---- 5.2 上传截图到OSS耗时：", end.Sub(start))
 
 	return filename, err

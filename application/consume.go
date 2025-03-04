@@ -2,15 +2,16 @@ package application
 
 import (
 	"encoding/json"
+	"etarantula/models"
+	"etarantula/service"
 	"fmt"
-	"github.com/JokerLiAnother/rabbitmq"
-	"github.com/spf13/viper"
 	"log"
 	"os"
 	"strings"
-	"tarantula-v2/models"
-	"tarantula-v2/service"
 	"time"
+
+	"github.com/JokerLiAnother/rabbitmq"
+	"github.com/spf13/viper"
 )
 
 // consumeHandler 消息处理函数

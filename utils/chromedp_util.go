@@ -114,6 +114,16 @@ func GetScreenshot(ctx context.Context, height int64) ([]byte, error) {
 	return buf, nil
 }
 
+// GetScreenshotBySelector chromedp 获取指定选择器的截图，并返回base64编码
+func GetScreenshotBySelector(ctx context.Context, selector string) ([]byte, error) {
+	var buf []byte
+	err := chromedp.Run(ctx, chromedp.Screenshot(selector, &buf, chromedp.NodeVisible))
+	if err != nil {
+		return nil, err
+	}
+	return buf, nil
+}
+
 // GetHtml chromedp 获取当前页面html
 func GetHtml(ctx context.Context) (string, error) {
 	var html string

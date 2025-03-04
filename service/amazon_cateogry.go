@@ -1,20 +1,25 @@
+// Deprecated: This file is deprecated since 2024-03-04 as per README.md.
+// Amazon product information fetching functionality has been removed from this project.
+// Only eBay product information fetching and product screenshot uploading to OSS remain.
+
 package service
 
 import (
 	"context"
 	"errors"
+	"etarantula/config"
+	"etarantula/models"
+	"etarantula/ossutil"
+	"etarantula/utils"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/spf13/viper"
 	"log"
 	"os"
 	"strconv"
 	"strings"
-	"tarantula-v2/config"
-	"tarantula-v2/models"
-	"tarantula-v2/ossutil"
-	"tarantula-v2/utils"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/spf13/viper"
 )
 
 const (

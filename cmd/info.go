@@ -7,9 +7,9 @@ import (
 	"github.com/spf13/cobra"
 	"log"
 	"strings"
-	"tarantula-v2/config"
-	"tarantula-v2/models"
-	"tarantula-v2/service"
+	"etarantula/config"
+	"etarantula/models"
+	"etarantula/service"
 )
 
 var channel, productNo, country string
@@ -19,7 +19,7 @@ var infoCmd = &cobra.Command{
 	Use:   "info",
 	Short: "请求品类信息",
 	Long: `通过命令行获取品类信息，例如：
-tarantula-v2 info --config .tarantula.yaml --product BXXXX2341 --country de --channel amazon`,
+etarantula info --config .tarantula.yaml --product BXXXX2341 --country de --channel amazon`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		log.Println("info called")
