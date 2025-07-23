@@ -1,9 +1,9 @@
-package application
+package rabbitmq
 
 import (
 	"encoding/json"
-	"etarantula/models"
-	"etarantula/service"
+	"etarantula/internal/models"
+	"etarantula/internal/service"
 	"fmt"
 	"log"
 	"os"

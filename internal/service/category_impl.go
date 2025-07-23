@@ -1,6 +1,6 @@
 package service
 
-import "etarantula/models"
+import "etarantula/internal/models"
 
 type CategoryServiceImpl interface {
 

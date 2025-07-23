@@ -31,6 +31,8 @@ ebay:
   price-selectors: "#mainContent div.x-price-primary"
   # ebay 图片需要高一些，否则会被相似商品遮挡
   screenshot-height: 1680
+  # 截图选择器，用于截图时，只截图商品信息区域; 多个选择器用逗号分隔
+  screenshot-selector: "#CenterPanel,div.x-vi-evo-main-container__top-panel"
 
 mq:
   consumer:

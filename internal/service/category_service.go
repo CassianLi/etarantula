@@ -1,7 +1,7 @@
 package service
 
 import (
-	"etarantula/models"
+	"etarantula/internal/models"
 	"fmt"
 	"log"
 

@@ -4,12 +4,13 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"etarantula/internal/config"
+	rabbitmq "etarantula/internal/rabbit"
 	"fmt"
+	"os"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
-	"etarantula/application"
-	"etarantula/config"
 )
 
 var cfgFile string
@@ -26,7 +27,7 @@ var rootCmd = &cobra.Command{
 		initGlobalVariables()
 
 		// 启动消费者
-		application.Consuming()
+		rabbitmq.Consuming()
 
 		// 永不退出
 		select {}

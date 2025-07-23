@@ -3,10 +3,10 @@ package service
 import (
 	"context"
 	"errors"
-	"etarantula/config"
-	"etarantula/models"
-	"etarantula/ossutil"
-	"etarantula/utils"
+	"etarantula/internal/config"
+	"etarantula/internal/models"
+	"etarantula/internal/ossutil"
+	"etarantula/internal/utils"
 	"fmt"
 	"log"
 	"os"
@@ -240,19 +240,22 @@ func (ebay *EbayCategory) getScreenshotByHeight(ctx context.Context) (bytes []by
 
 // 以selector截图
 func (ebay *EbayCategory) getScreenshotBySelector(ctx context.Context) (bytes []byte, err error) {
-	selector := viper.GetString("ebay.screenshot-selector")
+	selectors := viper.GetString("ebay.screenshot-selector")
+	selectorsArr := strings.Split(selectors, ",")
 
-	start := time.Now()
-
-	bys, err := utils.GetScreenshotBySelector(ctx, selector)
-	if err != nil {
-		return bys, err
+	for _, selector := range selectorsArr {
+		bytes, err = utils.GetScreenshotBySelector(ctx, selector)
+		if err == nil && len(bytes) > 0 {
+			return bytes, nil
+		} else {
+			fmt.Println("selector: ", selector, "screenshot error: ", err)
+		}
 	}
 
-	end := time.Now()
-	log.Println("---- 5.1 以selector截图，截图耗时：", end.Sub(start))
+	fmt.Println("---- 5.1 以selector截图，所有selector截图失败")
+	log.Println("---- 5.1 以selector截图，所有selector截图失败")
 
-	return bys, err
+	return nil, errors.New("截图失败")
 }
 
 // 保存截图

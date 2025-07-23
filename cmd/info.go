@@ -7,9 +7,9 @@ import (
 	"github.com/spf13/cobra"
 	"log"
 	"strings"
-	"etarantula/config"
-	"etarantula/models"
-	"etarantula/service"
+	"etarantula/internal/config"
+	"etarantula/internal/models"
+	"etarantula/internal/service"
 )
 
 var channel, productNo, country string
